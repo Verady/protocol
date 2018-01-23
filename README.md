@@ -1,4 +1,4 @@
-Verday Protocol
+Verady Protocol
 ===============
 
 | Document | License |
