@@ -408,7 +408,7 @@ include any chain-specific information.
   "to": <UNIX_TIME_END>,
   "transactions": [
     {
-      // TODO: Define parsed transaction object schema
+      // TODO: Define parsed transaction object schema - @neppinger/@niahmiah
     }
   ],
   "balance": {
@@ -489,7 +489,7 @@ Instructs the daemon to dispatch a series of `CREATE_SNAPSHOT` RPC messages to
 verifier nodes, which are processed and validated before the final result is 
 written back to the socket.
 
-**Parameters:** `{ consensus: [consistency, total], chain, selection: { address, from, to } }`  
+**Parameters:** `{ consensus: [consistency, total], chain, selection: [{ address, from, to }] }`  
 **Results:** `[...transactionN]`
 
 #### `REGISTER_MODULE`
