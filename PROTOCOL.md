@@ -421,10 +421,16 @@ include any chain-specific information.
 6    Implementation
 -------------------
 
-TODO: Define internal API
+The Veranet daemon process itself is responsible for connecting to Veranet and 
+both processing any work requests for which a corresponding chain module is 
+registered and dispatching work requests to the network. The latter 
+responsibility is carried out by listening for authenticated requests from the 
+node operator via a local JSON-RPC server _(6.4: Veranet API)_, while the 
+former responsibility is handled via the Veranet daemon connecting to a 
+registered chain module via bi-directional stream, either TCP or UNIX domain 
+socket _(6.1: Chain Modules)_.
 
-6.1    Chain Modules
---------------------
+### 6.1    Chain Modules
 
 A chain module is a standalone piece of software that communicates with the 
 Veranet daemon process and implements a standard API for receiving audit jobs 
@@ -434,8 +440,7 @@ and verification of snapshots for sets of addresses and timeframes.
 
 TODO: Define internal API
 
-6.2    Verifier Selection
--------------------------
+### 6.2   Verifier Selection
 
 When an end user wishes to enlist a set of verifiers (`N`) to perform some 
 work, a consensus metric is supplied that includes the total number of nodes to 
@@ -465,10 +470,42 @@ however must continue to wait for remaining nodes to report results or timeout,
 so that consistency metrics can be recorded for future verifier selection and 
 payments can be prepared for issuance _(6.3: Payment Issuance)_.
 
-6.3    Payment Issuance
------------------------
+### 6.3    Payment Issuance
 
 TODO: Define process for executing rewards payments
+
+### 6.4    Veranet API
+
+The Veranet daemon exposes a local RPC server via UNIX domain socket and will 
+accept JSON-RPC payloads as newline terminated strings. The use of domain 
+sockets allows for improved security, leveraging POSIX file ownership and 
+users to prevent unauthorized control of the daemon from other users or 
+processes on the same system and prevents remote intrusion. The JSON-RPC 
+message format is the same as described in _4: Remote Procedure Calls_.
+
+#### `AUDIT_SELECTION`
+
+Instructs the daemon to dispatch a series of `CREATE_SNAPSHOT` RPC messages to 
+verifier nodes, which are processed and validated before the final result is 
+written back to the socket.
+
+**Parameters:** `{ consensus: [consistency, total], chain, selection: { address, from, to } }`  
+**Results:** `[...transactionN]`
+
+#### `REGISTER_MODULE`
+
+Registers the chain module service with the daemon, instructing the daemon to 
+begin advertising its support for the chain and passing any work requests to 
+the module via the `endpoint` defined for the `chain` _(6.1: Chain Modules)_.
+
+The `endpoint` parameter must be a valid URI to a TCP or UNIX domain socket, 
+such as `tcp://localhost:1234` or `unix:///path/to/module.sock`. When the chain 
+module has completed the work, it writes the result back to the connected 
+client that initiated it (the Veranet daemon), which in turn dispatches a 
+`REPORT_SNAPSHOT` to the node that originated the request.
+
+**Parameters:** `[chain, endpoint]`  
+**Results:** `[]`
 
 7    References
 ---------------
