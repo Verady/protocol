@@ -505,6 +505,10 @@ module has completed the work, it writes the result back to the connected
 client that initiated it (the Veranet daemon), which in turn dispatches a 
 `REPORT_SNAPSHOT` to the node that originated the request.
 
+The module will automatically be unregistered in the event the connection to 
+the module closes (the module crashes or restarts), so it the responsibility of 
+chain modules to connect to the daemon upon startup.
+
 **Parameters:** `[chain, endpoint]`  
 **Results:** `[]`
 
