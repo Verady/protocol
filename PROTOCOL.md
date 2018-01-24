@@ -386,30 +386,89 @@ When a chain module has completed some work in service of a `CREATE_SNAPSHOT`
 request, the results are delivered to the originator in a `REPORT_SNAPSHOT` 
 RPC message. The payload includes a two-dimensional list structure, where each 
 nested list is positioned as a map to the original work request and contains 
-parsed transaction objects _(5: Transaction Report Schema)_.
+parsed transaction objects _(5: Transaction Report Schema)_ along with a 
+destination payment address for work reward.
 
-Parameters: `[merkle_root_160, chain_code, [...[...transactionN]]]`  
+Parameters: `[merkle_root_160, chain_code, [...[...transactionN]], payment_dest]`  
 Results: `[]`
 
 5    Transaction Report Schema
 ------------------------------
 
-TODO
+A transaction report is an individual result included in a `REPORT_SNAPSHOT` 
+result list that corresponds to an individual `{ address, to, from }` item 
+included in a `CREATE_SNAPSHOT` message. Transaction reports follow a common 
+schema across all chains and include an additional metadata field that may 
+include any chain-specific information.
+
+```
+{
+  "address": "<PAYMENT_ADDRESS>",
+  "from": <UNIX_TIME_START>,
+  "to": <UNIX_TIME_END>,
+  "transactions": [
+    {
+      // TODO: Define parsed transaction object schema
+    }
+  ],
+  "balance": {
+    "start": <BALANCE_AT_FROM>,
+    "end": <BALANCE_AT_TO>
+  }
+}
+```
 
 6    Implementation
 -------------------
 
-TODO
+TODO: Define internal API
 
 6.1    Chain Modules
 --------------------
 
-TODO
+A chain module is a standalone piece of software that communicates with the 
+Veranet daemon process and implements a standard API for receiving audit jobs 
+and providing results of those jobs back to the Veranet daemon. The purpose of 
+a chain module is to implement specific blockchains that may be used for audit 
+and verification of snapshots for sets of addresses and timeframes.
+
+TODO: Define internal API
 
 6.2    Verifier Selection
 -------------------------
 
-TODO
+When an end user wishes to enlist a set of verifiers (`N`) to perform some 
+work, a consensus metric is supplied that includes the total number of nodes to 
+enlist and the total number of nodes who must supply matching results to be 
+considered trustworthy (`M`).
+
+To ensure even distribution of work, `N * 2` nodes are selected from the 
+routing table that are closest the the 160 bit merkle root identifier of the 
+work to be performed, where `N` is equal to the total nodes to enlist. These 
+nodes are sorted by their distance from the merkle root and filtered using any 
+implementation specific rules that track how frequently a given node has 
+provided inconsistent results within previous work sets.
+
+If the resulting node selection after filtering is less than `N`, the missing 
+nodes should be filled by randomly selected nodes from the routing table that 
+satisfy implementation specific metrics for trust/past consistency. Once `N` 
+verifier nodes are collected, each is sent the `CREATE_SNAPSHOT` RPC message. 
+If a target verifier is offline or otherwise cannot be reached, it is replaced 
+using the aforementioned random node selection.
+
+Once a work snapshot request is dispatched and acknowledged by the target, the 
+sending node must track the job's pending status until a matching 
+`REPORT_SNAPSHOT` is received from the target node, at which time the results 
+are collected until `M` matching results are received. When `M` matching 
+results are received, implementations may pre-emptively process the results, 
+however must continue to wait for remaining nodes to report results or timeout, 
+so that consistency metrics can be recorded for future verifier selection and 
+payments can be prepared for issuance _(6.3: Payment Issuance)_.
+
+6.3    Payment Issuance
+-----------------------
+
+TODO: Define process for executing rewards payments
 
 7    References
 ---------------
