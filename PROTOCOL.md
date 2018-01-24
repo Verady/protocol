@@ -414,7 +414,9 @@ include any chain-specific information.
   "balance": {
     "start": <BALANCE_AT_FROM>,
     "end": <BALANCE_AT_TO>
-  }
+  },
+  "chain": <CHAIN_CODE>,
+  "meta": {}
 }
 ```
 
