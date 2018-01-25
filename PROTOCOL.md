@@ -439,7 +439,13 @@ and providing results of those jobs back to the Veranet daemon. The purpose of
 a chain module is to implement specific blockchains that may be used for audit 
 and verification of snapshots for sets of addresses and timeframes.
 
-TODO: Define internal API
+Chain modules must expose an endpoint in the form of either a TCP socket or a
+UNIX domain socket that reads newline terminated JSON-RPC payloads containing 
+a variable number of `{ address, from, to }` parameters to process. When the 
+job is complete, the chain module writes the JSON-RPC result in the form of a 
+positional list structure containing the reports 
+_(5: Transaction Report Schema)_ back to the connected daemon which in turn 
+dispatches the corresponding `REPORT_SNAPSHOT` back to the requesting node.
 
 ### 6.2   Verifier Selection
 
@@ -506,8 +512,8 @@ client that initiated it (the Veranet daemon), which in turn dispatches a
 `REPORT_SNAPSHOT` to the node that originated the request.
 
 The module will automatically be unregistered in the event the connection to 
-the module closes (the module crashes or restarts), so it the responsibility of 
-chain modules to connect to the daemon upon startup.
+the module closes (the module crashes or restarts), so it's the responsibility 
+of chain modules to connect to the daemon upon startup.
 
 **Parameters:** `[chain, endpoint]`  
 **Results:** `[]`
