@@ -479,7 +479,21 @@ payments can be prepared for issuance _(6.3: Payment Issuance)_.
 
 ### 6.3    Payment Issuance
 
-TODO: Define process for executing rewards payments
+> This section is reserved for future work and is likely to change.
+
+Upon the exchange of a `REPORT_SNAPSHOT` message, both the issuer and verifier 
+must store a record of the exchange. The issuer may choose to collect all 
+payments it is responsible for within a reasonable timeframe and issue a single 
+transaction on a regular interval to pay verifier nodes to save on transaction 
+fees.
+
+Conversely, verifiers must record all expected payments for past 
+`REPORT_SNAPSHOT` messages sent (each having a unique payment address 
+generated) and monitor funds sent to that address. Once a payment is received 
+for a `REPORT_SNAPSHOT`, the verifier should record that a payment was 
+received to build trust metrics with other peers. Depending on implementation, 
+nodes who pay higher or more promptly may be given priority for the service of 
+`CREATE_SNAPSHOT` messages.
 
 ### 6.4    Veranet API
 
