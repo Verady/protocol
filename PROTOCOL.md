@@ -408,14 +408,47 @@ include any chain-specific information.
   "to": <UNIX_TIME_END>,
   "transactions": [
     {
-      // TODO: Define parsed transaction object schema - @neppinger/@niahmiah
+      tx: {
+        hash: "<TRANSACTION_HASH>" 
+        from: [
+          {
+            address: "<ADDRESS>",
+            amounts: [
+              {
+                symbol: "<CURRENCY_CODE>",
+                amount: <AMOUNT>, 
+                decimals: <NUM_DECIMALS>,
+              }
+            ]
+          }
+        ],
+        to: [
+          {
+            address: "<ADDRESS>",
+            amounts: [
+              {
+                symbol: "<CURRENCY_CODE>",
+                amount: <AMOUNT>, 
+                decimals: <NUM_DECIMALS>,
+              }
+            ]
+          }
+        ],
+        timestamp: <CURRENT_UNIX_TIME>,
+        blockNumber: <BLOCK_NUMBER>, 
+        blockHash: "<BLOCK_HASH", 
+        fee: {
+          amounts: [
+            {
+              symbol: "<CURRENCY_CODE>",
+              amount: <FEE_AMOUNT>
+            }
+          ]
+        }
+      }, 
+      meta: {}
     }
-  ],
-  "balance": {
-    "start": <BALANCE_AT_FROM>,
-    "end": <BALANCE_AT_TO>
-  },
-  "meta": {}
+  ]
 }
 ```
 
